@@ -70,3 +70,25 @@ npm i
 ```
 
 このコマンドから環境を同期することができる。
+
+# 起動手順
+
+cd コマンドで`mobile`ディレクトリに移動する。
+
+## case1, web
+
+以下のコマンドから web 用のサーバが立ちあがる。
+
+```bash
+npm run web
+```
+
+## case2, android
+
+まず、Android Studio から Pixel Tablet の emulator を起動する。
+
+その後、以下のコマンドから Android 用のサーバを起動する。
+
+```bash
+npm run android
+```
