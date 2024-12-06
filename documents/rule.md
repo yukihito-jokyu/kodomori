@@ -52,7 +52,13 @@ git add .
 
 add を行った後に再び`git status`を行うと赤文字が緑の文字に変更する。
 
-③ commit を行う。
+③ Linter Formatter を起動する。
+
+```bash
+npm run lint
+```
+
+④ commit を行う。
 
 ```bash
 git commit -m "コメント"
@@ -60,7 +66,7 @@ git commit -m "コメント"
 
 ダブルクオーテーション内のコメントは任意だが、どのような作業をしたのか分かるような簡潔なコメントを記述して欲しい。
 
-④ リモートブランチに push する。
+⑤ リモートブランチに push する。
 
 ```bash
 git push origin issue/番号
@@ -68,7 +74,7 @@ git push origin issue/番号
 
 このコマンドを実行するとリモートレポジトリに新しいリモートブランチが作成される。
 
-⑤ プルリクを作成する。
+⑥ プルリクを作成する。
 github のリモートレポジトリに行き、Pull requests タブをクリックする。
 **New**ボタンを押し、作業の更新を行ったリモートブランチを選択したのち、**Create pull request**ボタンを押す。
 プルリクのコメントには作業内容を記載する。
