@@ -95,6 +95,14 @@ rye sync
 
 これは同期を行うコマンドなので、仮想環境構築以外にも使用される。
 
+### 7-3, pre-commit の適用
+
+python ディレクトリで以下のコマンドを実行することで pre-commit を適用させる。
+
+```bash
+rye run pre-commit install
+```
+
 # 起動手順
 
 cd コマンドで`mobile`ディレクトリに移動する。
