@@ -124,3 +124,11 @@ npm run web
 ```bash
 npm run android
 ```
+
+## python 側のサーバー起動方法
+
+以下のコマンドからサーバーを立てる。
+
+```bash
+rye run start
+```
