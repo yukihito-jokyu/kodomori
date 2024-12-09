@@ -127,8 +127,14 @@ npm run android
 
 ## python 側のサーバー起動方法
 
-以下のコマンドからサーバーを立てる。
+pythonディレクトリから以下のコマンドからサーバーを立てる。
 
 ```bash
 rye run start
+```
+
+エラーが出る場合、cdコマンドでpython/srcディレクトリに移動し、以下のコマンドからサーバーを立てる。
+
+```bash
+rye run uvicorn main:app --reload
 ```
