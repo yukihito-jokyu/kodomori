@@ -30,3 +30,6 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/python"]
+
+[tool.rye.scripts]
+start = "uvicorn main:app --reload"
