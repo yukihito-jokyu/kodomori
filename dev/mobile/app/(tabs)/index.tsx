@@ -15,7 +15,7 @@ export default function HomeScreen() {
           <Home size={24} color="#007AFF" />
           <Text style={styles.navText}>ホーム</Text>
         </Link>
-        <Link href="/area" style={styles.navItem}>
+        <Link href="\dangerous_area" style={styles.navItem}>
           <Map size={24} color="#007AFF" />
           <Text style={styles.navText}>エリア指定</Text>
         </Link>

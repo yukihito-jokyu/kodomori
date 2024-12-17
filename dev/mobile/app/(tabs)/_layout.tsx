@@ -6,7 +6,7 @@ export default function Layout() {
     <SafeAreaProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="area" options={{ title: 'エリア指定' }} />
+        <Stack.Screen name="dangerous_area" options={{ title: 'エリア指定' }} />
         <Stack.Screen name="log" options={{ title: 'ログ再生' }} />
         <Stack.Screen name="settings" options={{ title: '設定' }} />
       </Stack>
