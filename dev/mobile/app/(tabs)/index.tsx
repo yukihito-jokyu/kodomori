@@ -23,7 +23,7 @@ export default function HomeScreen() {
           <PlayCircle size={24} color="#007AFF" />
           <Text style={styles.navText}>ログ再生</Text>
         </Link>
-        <Link href="/settings" style={styles.navItem}>
+        <Link href="/streaming" style={styles.navItem}>
           <Settings size={24} color="#007AFF" />
           <Text style={styles.navText}>設定</Text>
         </Link>
