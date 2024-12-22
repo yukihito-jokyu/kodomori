@@ -98,17 +98,66 @@
 
 ######################################12月18日########################################
 
-from fastapi import WebSocket
+# from fastapi import WebSocket
+# import asyncio
+
+
+# async def websocket_send_numbers(websocket: WebSocket):
+#     await websocket.accept()  # WebSocket接続を承認
+#     try:
+#         for i in range(10):  # 0～9を順に送信
+#             await websocket.send_text(str(i))
+#             await asyncio.sleep(1)  # 1秒間隔
+#             print(i)
+#     except Exception as e:
+#         print(f"WebSocket Error: {e}")
+#     finally:
+#         await websocket.close()
+
+#######################################12月19日#######################################
+
 import asyncio
+import cv2
+import base64
+from fastapi import APIRouter, WebSocketDisconnect, WebSocket
+
+router = APIRouter(
+    prefix="/ws/streaming",
+    tags=["test"],
+    responses={404: {"description": "Not found"}},
+)
 
 
-async def websocket_send_numbers(websocket: WebSocket):
+# WebSocketエンドポイント
+@router.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()  # WebSocket接続を承認
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        await websocket.close()
+        print("Camera not accessible")
+        return
+
     try:
-        for i in range(10):  # 0～9を順に送信
-            await websocket.send_text(str(i))
-            await asyncio.sleep(1)  # 1秒間隔
+        while True:
+            ret, frame = cap.read()  # 映像フレームを取得
+            if not ret:
+                break
+
+            # フレームをJPEG形式にエンコード
+            _, buffer = cv2.imencode(".jpg", frame)
+            # Base64エンコードしてテキスト形式に変換
+            frame_base64 = base64.b64encode(buffer).decode("utf-8")
+            # WebSocketで送信
+            await websocket.send_text(frame_base64)
+            # 適切なフレームレートで送信
+            await asyncio.sleep(0.03)  # 約30fps
+
+    except WebSocketDisconnect:
+        print("WebSocket disconnected")
     except Exception as e:
-        print(f"WebSocket Error: {e}")
+        print(f"Error: {e}")
     finally:
+        cap.release()  # カメラリソースを解放
         await websocket.close()

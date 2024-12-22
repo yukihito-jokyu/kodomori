@@ -205,11 +205,11 @@
 ////////////////////////////////////////////////////
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text, StyleSheet } from 'react-native';
+import { SafeAreaView, Text, StyleSheet,Image,View } from 'react-native';
 
 const StreamingScreen: React.FC = () => {
   const [status, setStatus] = useState<string>('Disconnected'); // 接続状態
-  const [receivedMessage, setReceivedMessage] = useState<string>('None'); // サーバーからのメッセージ
+  const [imageData, setImageData] = useState<string | null>('null'); // サーバーからのメッセージ
 
   console.log('Component rendering started');
 
@@ -217,7 +217,8 @@ const StreamingScreen: React.FC = () => {
 
     console.log('WebSocket initializing...');
     // WebSocket接続
-    const ws = new WebSocket('ws://127.0.0.1:8000/ws'); // バックエンドのURL
+    // const ws = new WebSocket('ws://localhost:8000/ws'); // バックエンドのURL
+    const ws = new WebSocket('ws://localhost:8000/ws/streaming/ws'); // バックエンドのURL
 
     ws.onopen = () => {
       setStatus('Connected');
@@ -225,8 +226,7 @@ const StreamingScreen: React.FC = () => {
     };
 
     ws.onmessage = (event: MessageEvent) => {
-      setReceivedMessage(event.data);
-      console.log('Received:', event.data);
+      setImageData(`data:image/jpeg;base64,${event.data}`); // Base64データをImageに変換
     };
 
     ws.onerror = () => {
@@ -247,9 +247,15 @@ const StreamingScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>WebSocket Streaming</Text>
+      <Text style={styles.title}>Camera Streaming</Text>
       <Text>Status: {status}</Text>
-      <Text>Received: {receivedMessage}</Text>
+      <View style={styles.imageContainer}>
+        {imageData ? (
+          <Image style={styles.image} source={{ uri: imageData }} />
+        ) : (
+          <Text>Waiting for data...</Text>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -266,12 +272,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  message: {
-    fontSize: 20,
-    color: 'blue',
+  imageContainer: {
+    width: 300,
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
-
 export default StreamingScreen;
 
 

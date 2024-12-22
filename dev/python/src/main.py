@@ -60,9 +60,37 @@
 #     return {"message": "WebSocket Test Application"}
 
 
-####################################12月18日#####################################
-from fastapi import FastAPI, WebSocket
-from websocket.socket_import import websocket_send_numbers
+####################################12月18日 成功#####################################
+# from fastapi import FastAPI, WebSocket
+# from websocket import socket_import
+# import asyncio
+
+# app = FastAPI()
+
+
+# @app.get("/")
+# async def root():
+#     return {"message": "WebSocket Backend Ready"}
+
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     # await socket_import.websocket_send_numbers(websocket)
+#     await websocket.accept()  # WebSocket接続を承認
+#     try:
+#         for i in range(10):  # 0～9を順に送信
+#             await websocket.send_text(str(i))
+#             await asyncio.sleep(1)  # 1秒間隔
+#             print(i)
+#     except Exception as e:
+#         print(f"WebSocket Error: {e}")
+#     finally:
+#         await websocket.close()
+
+###########################################12月19日##############################
+
+from fastapi import FastAPI
+from websocket.socket_import import router as websocket_router
 
 app = FastAPI()
 
@@ -72,6 +100,18 @@ async def root():
     return {"message": "WebSocket Backend Ready"}
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket_send_numbers(websocket)
+app.include_router(websocket_router)
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     # await socket_import.websocket_send_numbers(websocket)
+#     await websocket.accept()  # WebSocket接続を承認
+#     try:
+#         for i in range(10):  # 0～9を順に送信
+#             await websocket.send_text(str(i))
+#             await asyncio.sleep(1)  # 1秒間隔
+#             print(i)
+#     except Exception as e:
+#         print(f"WebSocket Error: {e}")
+#     finally:
+#         await websocket.close()
