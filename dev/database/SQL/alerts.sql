@@ -1,6 +1,6 @@
 CREATE TABLE alerts (
     alert_id VARCHAR(255) PRIMARY KEY,
-    nursery_school_id VARCHAR(255),
+    nursery_school_id VARCHAR(255) NOT NULL,
     message VARCHAR(255) NOT NULL,
     is_read BOOLEAN NOT NULL,
     time TIMESTAMP NOT NULL,
