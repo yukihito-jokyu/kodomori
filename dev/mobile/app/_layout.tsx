@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Provider } from 'react-redux';
+import store from "../redux/store"
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -22,7 +24,7 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
 
-      router.replace('/login')
+      router.replace('/login' as any)
     }
   }, [loaded]);
 
@@ -32,12 +34,14 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack> 
+      <Provider store={store}>
+        <Stack>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+        </Stack>
+        <StatusBar style="auto" />
+      </Provider>
     </ThemeProvider>
   );
 }
