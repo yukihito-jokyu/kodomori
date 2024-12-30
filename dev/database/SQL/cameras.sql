@@ -1,8 +1,8 @@
 CREATE TABLE cameras (
     camera_id VARCHAR(255) PRIMARY KEY,
-    nursery_school_id VARCHAR(255),
+    nursery_school_id VARCHAR(255) NOT NULL,
     is_setting_floor_area BOOLEAN NOT NULL,
-    picture BOOLEAN NOT NULL,
+    picture BYTEA NOT NULL,
     distance_p1_p2 INT NOT NULL,
     distance_p1_p3 INT NOT NULL,
     distance_p1_p4 INT NOT NULL,
