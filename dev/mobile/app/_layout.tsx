@@ -24,7 +24,7 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
 
-      router.replace('/login' as any)
+      // router.replace('/login' as any)
     }
   }, [loaded]);
 
