@@ -7,7 +7,7 @@ import CameraTile from '@/components/CameraList/CameraTile';
 
 // import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
 
-export default function LoginScreen() {
+export default function CameraListScreen() {
     const [tiles, SetTiles] = useState([{
         name: "a",
         picture: "",
