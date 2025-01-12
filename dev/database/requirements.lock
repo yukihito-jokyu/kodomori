@@ -17,9 +17,6 @@ anyio==4.8.0
     # via watchfiles
 click==8.1.8
     # via uvicorn
-colorama==0.4.6
-    # via click
-    # via uvicorn
 fastapi==0.115.6
     # via database
 greenlet==3.1.1
@@ -37,6 +34,7 @@ pydantic==2.10.5
 pydantic-core==2.27.2
     # via pydantic
 python-dotenv==1.0.1
+    # via database
     # via uvicorn
 pyyaml==6.0.2
     # via uvicorn
@@ -54,6 +52,8 @@ typing-extensions==4.12.2
     # via sqlalchemy
 uvicorn==0.34.0
     # via database
+uvloop==0.21.0
+    # via uvicorn
 watchfiles==1.0.3
     # via uvicorn
 websockets==14.1
