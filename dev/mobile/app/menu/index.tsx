@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   ListRenderItem,
+  ViewStyle,
 } from 'react-native';
 
 interface DropdownItem {
@@ -38,6 +39,7 @@ const CameraCard: React.FC = () => {
       dropdownItems: [
         { id: '1-1', label: '危険エリアA' },
         { id: '1-2', label: '危険エリアB' },
+        { id: '1-3', label: '危険エリアC' },
       ],
     },
     {
@@ -47,7 +49,7 @@ const CameraCard: React.FC = () => {
       set_button: '危険エリア追加',
       dropdownItems: [
         { id: '2-1', label: '危険エリアC' },
-        { id: '2-2', label: '危険エリアD' },
+        // { id: '2-2', label: '危険エリアD' },
       ],
     },
     {
@@ -56,8 +58,8 @@ const CameraCard: React.FC = () => {
       status: '危険エリア n 箇所設定中',
       set_button: '床エリア追加',
       dropdownItems: [
-        // { id: '3-1', label: '床エリア1' },
-        // { id: '3-2', label: '床エリア2' },
+        { id: '3-1', label: '床エリア1' },
+        { id: '3-2', label: '床エリア2' },
       ],
     },
   ]);
@@ -73,25 +75,45 @@ const CameraCard: React.FC = () => {
   const handleMenuPress = (): void => {
     alert('メニューがタップされました');
   };
-
+  //プルダウン接続デザイン（縦線）
+  const verticalLine = (index: number):ViewStyle => {
+    return{
+      top: -11,
+      left: 550,
+      width: 3,
+      height: 19 + 147 * index, 
+      backgroundColor: "#001D6C",
+      position: "absolute",
+    }
+  };
+  
   // プルダウンメニューのアイテムをレンダリングする関数
-  const renderDropdownItem: ListRenderItem<DropdownItem> = ({ item }) => (
-    <View style={styles.dropdownItem}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/100' }} //textにして、'画像'と文字を表示することも可能
-          style={styles.image}
-        />
+  const renderDropdownItem: ListRenderItem<DropdownItem> = ({ item, index }) => (
+    <View style={styles.dropdownRow}>
+      {/* 接続デザイン */}
+      <View style={index === 0 ? null : styles.otherConnector}>
+        <View style={index === 0 ? null:styles.verticalLineOther} />
+        <View style={index === 0 ? null : styles.diagonalLineOther} />
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.itemLabel}>{item.label}</Text>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.buttonText}>編集</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton}>
-            <Text style={styles.buttonText}>削除</Text>
-          </TouchableOpacity>
+  
+      {/* プルダウンアイテム */}
+      <View style={styles.dropdownItem}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: 'https://via.placeholder.com/100' }} // textにして、'画像'と文字を表示することも可能
+            style={styles.image}
+          />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.itemLabel}>{item.label}</Text>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity style={styles.editButton}>
+              <Text style={styles.buttonText}>編集</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.deleteButton}>
+              <Text style={styles.buttonText}>削除</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -101,7 +123,7 @@ const CameraCard: React.FC = () => {
     <View style={{ flex: 1 }}>
       {/* ヘッダーを追加 */}
       <CustomHeader onMenuPress={handleMenuPress} />
-      {cameras.map((camera) => (
+      {cameras.map((camera,index) => (
         <View key={camera.id}>
           {/* 各カード */}
           <TouchableOpacity
@@ -147,6 +169,15 @@ const CameraCard: React.FC = () => {
           {/* プルダウンメニュー */}
           {dropdownStates[camera.id] && (
             <View style={styles.dropdown}>
+
+              {/* カード間の接続デザイン */}
+              {index < cameras.length && (
+                <View style={styles.connector}>
+                  <View style={verticalLine(camera.dropdownItems.length - 1)} />
+                  <View style={styles.diagonalLine} />
+                </View>
+              )}
+
               <FlatList
                 data={camera.dropdownItems} // カメラごとのデータを利用
                 keyExtractor={(item) => item.id}
@@ -154,7 +185,9 @@ const CameraCard: React.FC = () => {
               />
             </View>
           )}
+
         </View>
+
       ))}
     </View>
   );
@@ -167,13 +200,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 0,
     paddingVertical: 10, 
+    position:'relative',
     borderWidth: 1,
     borderColor: '#001D6C',
     borderRadius: 10,
     backgroundColor: 'rgba(227,232,203,0.3)',
     width: '90%',
     alignSelf: 'center',
-    marginVertical: 10,
+    top:20,
+    marginVertical:10,
   },
   imageContainer: {
     width: '25%',
@@ -264,8 +299,9 @@ const styles = StyleSheet.create({
   },
   
   dropdown: {
-    width: '90%',
-    alignSelf: 'center',
+    width: '100%',
+    left:60,
+    alignSelf: 'flex-start',
     marginVertical: 10,
     backgroundColor: 'transparent',
     borderWidth: 1,
@@ -274,14 +310,25 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   dropdownItem: {
+    width:'70%',
+    top:20,
+    left:34,
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: '#001D6C',
     borderRadius: 0,
-    padding: 10,
-    marginVertical: 5,
+    padding: 20,
+    marginVertical: 10,
+    marginRight:30,
   },
+
+  dropdownRow: { // 接続デザインとアイテムを横並びに
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+
   itemLabel: {
     fontSize: 13,
     color: '#000000',
@@ -315,6 +362,44 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: 'center',
     lineHeight:25,
+  },
+
+  connector: {
+    alignItems: "flex-start",
+    width: "90%",
+    alignSelf: "center",
+  },
+
+  diagonalLine: {
+    top:33,
+    left:509,
+    width: 50,
+    height: 3,
+    backgroundColor: "#001D6C",
+    transform: [{ rotate: "135deg" }],
+    marginVertical: -10,
+  },
+
+  otherConnector: {
+    alignItems: "flex-start",
+    width: "90%",
+    alignSelf: "center",
+  },
+  verticalLineOther: {
+    top:-31,
+    left:550,
+    width: 3,
+    height: 10,
+    backgroundColor: "#001D6C",
+  },
+  diagonalLineOther: {
+    top:13,
+    left:509,
+    width: 50,
+    height: 3,
+    backgroundColor: "#001D6C",
+    transform: [{ rotate: "135deg" }],
+    marginVertical: -10,
   },
   
 });
