@@ -18,15 +18,15 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-  const router = useRouter();
+  // const router = useRouter();
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+  // useEffect(() => {
+  //   if (loaded) {
+  //     SplashScreen.hideAsync();
 
-      // router.replace('/login' as any)
-    }
-  }, [loaded]);
+  //     router.replace('/login')
+  //   }
+  // }, [loaded]);
 
   if (!loaded) {
     return null;
@@ -38,6 +38,7 @@ export default function RootLayout() {
         <Stack>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="menu" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
