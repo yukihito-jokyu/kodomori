@@ -1,9 +1,14 @@
 import React from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import CustomHeaderNursery from '@/components/ContomHeaerNursery';
 
 export default function AlertDetailScreen() {
+    const handleMenuPress = (): void => {
+        alert('メニューがタップされました');
+      };
     return (
         <SafeAreaView style={styles.pearent}>
+            <CustomHeaderNursery onMenuPress={handleMenuPress} />
             <View style={styles.children}>
                 <Text style={styles.cameraName}>カメラの場所の名前</Text>
                 <Image style={styles.cameraImage}></Image>
@@ -22,11 +27,12 @@ const styles = StyleSheet.create({
         display: "flex",
         width: "100%",
         justifyContent: "center",
-        alignItems: "center"
     },
     children: {
         width: "80%",
-        marginTop: 40
+        marginTop: 40,
+        alignItems:'center',
+        left:75
     },
     cameraName: {
         fontSize: 30,
