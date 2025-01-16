@@ -64,12 +64,6 @@ psql -h localhost -p 5432 -U postgres -d kodomori
 \i alerts.sql
 ```
 
-## 今回使用しているデータベースのDATABASE_URL情報
-データベース"postgres"にユーザー"postgres"として、ホスト"localhost"(アドレス"::1")上のポート"5432"で接続しています。
-
-## 今回使用しているデータベースのパスワード
-kodomori_0110
-
 ## 基本的なデータベースコマンド
 
 ### データベース一覧の表示:
