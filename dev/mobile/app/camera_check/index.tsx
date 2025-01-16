@@ -1,17 +1,22 @@
 import React from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import CustomHeaderNursery from '@/components/ContomHeaerNursery';
+import WebView from 'react-native-webview';
 
 export default function CameraCheckScreen() {
     const handleMenuPress = (): void => {
         alert('メニューがタップされました');
-      };
+    };
     return (
         <SafeAreaView style={styles.pearent}>
             <CustomHeaderNursery onMenuPress={handleMenuPress} />
             <View style={styles.children}>
                 <Text style={styles.cameraName}>カメラの場所の名前</Text>
-                <Image style={styles.cameraImage}></Image>
+                <View style={styles.cameraImageFrame}>
+                    <WebView
+                        source={{ uri: "http://localhost:8000/video_feed" }}
+                    />
+                </View>
                 <View style={styles.backButtonWrapper}>
                     <View style={styles.backButton}>
                         <Text style={styles.backButtonText}>戻る</Text>
@@ -38,11 +43,11 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 600
     },
-    cameraImage: {
+    cameraImageFrame: {
         width: "100%",
         height: 450,
-        backgroundColor: "#D9D9D9"
-        
+        borderColor: "#D9D9D9",
+        borderWidth: 8,
     },
     backButtonWrapper: {
         width: "100%",

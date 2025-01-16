@@ -1,11 +1,14 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import FileResponse
 import os
-from routers import test as routers_test
-from websocket import test as websocket_test
+import threading
+
+from fastapi import FastAPI, File, UploadFile
 
 # **********CORS 設定
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from routers import test as routers_test
+from utils.test import capture_frames
+from websocket import test as websocket_test
 
 app = FastAPI()
 
@@ -63,3 +66,12 @@ async def list_images():
     ]
     print(f"image_files: {image_files}")
     return {"images": image_files}
+
+
+if __name__ == "__main__":
+    thread = threading.Thread(target=capture_frames)
+    thread.daemon = True
+    thread.start()
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
