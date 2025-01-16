@@ -98,9 +98,9 @@ const CameraCard: React.FC = () => {
   
       {/* プルダウンアイテム */}
       <View style={styles.dropdownItem}>
-        <View style={styles.imageContainer}>
+        <View style={styles.DropimageContainer}>
           <Image
-            source={{ uri: 'https://via.placeholder.com/100' }} // textにして、'画像'と文字を表示することも可能
+            source={{ uri: 'test' }} // textにして、'画像'と文字を表示することも可能
             style={styles.image}
           />
         </View>
@@ -132,7 +132,7 @@ const CameraCard: React.FC = () => {
           >
             <View style={styles.imageContainer}>
               <Image
-                source={{ uri: 'https://via.placeholder.com/100' }} //textにして、'画像'と文字を表示することも可能
+                source={{ uri: 'test' }} //textにして、'画像'と文字を表示することも可能
                 style={styles.image}
               />
             </View>
@@ -211,17 +211,24 @@ const styles = StyleSheet.create({
     marginVertical:10,
   },
   imageContainer: {
-    width: '25%',
-    height: '120%',
+    width: '24%',
+    height: '119%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#E6E6E6',
     borderRadius: 10,
   },
+  DropimageContainer:{
+    width: '24%',
+    height: '119%',
+
+    backgroundColor: '#000000',
+    borderRadius: 10,
+  },
   image: {
     width: 60,
     height: 60,
-    borderRadius: 5,
+
   },  
   textContainer: {
     flex: 3,
