@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Depends
-from pydantic import BaseModel
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import create_engine
 from datetime import datetime
+
 import psycopg2
+from fastapi import Depends, FastAPI
+from pydantic import BaseModel
+from sqlalchemy import create_engine
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session, sessionmaker
 
 # FastAPIアプリケーションの初期化
 app = FastAPI()
