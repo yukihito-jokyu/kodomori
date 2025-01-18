@@ -16,6 +16,8 @@ anyio==4.7.0
     # via starlette
 click==8.1.7
     # via uvicorn
+colorama==0.4.6
+    # via click
 fastapi==0.115.6
     # via python
 h11==0.14.0
@@ -43,4 +45,6 @@ typing-extensions==4.12.2
     # via pydantic
     # via pydantic-core
 uvicorn==0.32.1
+    # via python
+websockets==14.1
     # via python

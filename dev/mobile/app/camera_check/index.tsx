@@ -1,21 +1,59 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import CustomHeaderNursery from '@/components/ContomHeaerNursery';
-import WebView from 'react-native-webview';
 
 export default function CameraCheckScreen() {
     const handleMenuPress = (): void => {
         alert('メニューがタップされました');
     };
+    const [status, setStatus] = useState<string>('Disconnected'); // 接続状態
+    const [imageData, setImageData] = useState<string | null>('null'); // サーバーからのメッセージ
+
+    console.log('Component rendering started');
+
+    useEffect(() => {
+
+        console.log('WebSocket initializing...');
+        // WebSocket接続
+        // const ws = new WebSocket('ws://localhost:8000/ws'); // バックエンドのURL
+        const ws = new WebSocket('ws://localhost:8000/ws/camera/get'); // バックエンドのURL
+
+        ws.onopen = () => {
+        setStatus('Connected');
+        console.log('WebSocket connection opened');
+        };
+
+        ws.onmessage = (event: MessageEvent) => {
+        setImageData(`data:image/jpeg;base64,${event.data}`); // Base64データをImageに変換
+        };
+
+        ws.onerror = () => {
+        setStatus('Error: Unable to connect');
+        console.error('WebSocket Error');
+        };
+
+        ws.onclose = () => {
+        setStatus('Disconnected');
+        console.log('WebSocket connection closed');
+        };
+
+        return () => {
+        console.log('WebSocket cleanup');
+        ws.close(); // コンポーネントがアンマウントされた時に接続を閉じる
+        };
+    }, []);
+
     return (
         <SafeAreaView style={styles.pearent}>
             <CustomHeaderNursery onMenuPress={handleMenuPress} />
             <View style={styles.children}>
                 <Text style={styles.cameraName}>カメラの場所の名前</Text>
                 <View style={styles.cameraImageFrame}>
-                    <WebView
-                        source={{ uri: "http://localhost:8000/video_feed" }}
-                    />
+                    {imageData ? (
+                        <Image style={styles.image} source={{ uri: imageData }} />
+                    ) : (
+                        <Text>Waiting for data...</Text>
+                    )}
                 </View>
                 <View style={styles.backButtonWrapper}>
                     <View style={styles.backButton}>
@@ -67,5 +105,10 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         color: "#FFFFFF"
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
 });
