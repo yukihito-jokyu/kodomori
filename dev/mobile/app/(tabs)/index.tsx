@@ -29,6 +29,10 @@ export default function HomeScreen() {
           <Settings size={24} color="#007AFF" />
           <Text style={styles.navText}>設定</Text>
         </Link>
+        <Link href="/test" style={styles.navItem}>
+          <Settings size={24} color="#007AFF" />
+          <Text style={styles.navText}>テスト</Text>
+        </Link>
       </View>
     </SafeAreaView>
   );

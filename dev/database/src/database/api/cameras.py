@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from utils.type import (
     CameraResponse,
     CamerasFloorCreate,
     CamerasFloorResponse,
+    PictureResponse,
+    CamerasFloorCheck,
 )
 
 from ..session_db import get_db
-from ..setup import CAMERAS
+from ..setup import CAMERAS, USERS
 
 router = APIRouter(
     prefix="/cameras",
@@ -34,58 +36,85 @@ def get_cameras(nursery_school_id: str, db: Session = Depends(get_db)):
 
 
 # 床を設定しているかどうかを確認するAPI
-@router.get("/floor_setting", response_model=CamerasFloorResponse)
+@router.get("/floor_setting", response_model=CamerasFloorCheck)
 def floor_setting(camera_id: str, db: Session = Depends(get_db)):
-    cameras = db.query(CAMERAS).filter(CAMERAS.camera_id == camera_id).first()
-    return cameras.is_setting_floor_area
+    cameras = (
+        db.query(CAMERAS.is_setting_floor_area)
+        .filter(CAMERAS.camera_id == camera_id)
+        .first()
+    )
+    return cameras
 
 
 # 画像を取得するAPI
-@router.get("/picture", response_model=CameraResponse)
+@router.get("/picture", response_model=PictureResponse)
 def get_picture(camera_id: str, db: Session = Depends(get_db)):
-    cameras = db.query(CAMERAS).filter(CAMERAS.camera_id == camera_id).first()
-    return cameras.picture
+    cameras = db.query(CAMERAS.picture).filter(CAMERAS.camera_id == camera_id).first()
+    return cameras
+
+
+def check_camera_id_exists(camera_id: str, db: Session) -> bool:
+    return db.query(CAMERAS).filter(CAMERAS.camera_id == camera_id).first() is not None
 
 
 # 床エリアを保存するAPI
 @router.post("/add_floor")
 def create_floor(floor: CamerasFloorCreate, db: Session = Depends(get_db)):
-    db_floor = CAMERAS(
-        camera_id=floor.camera_id,
-        coordinate_p1=floor.coordinate_p1,
-        coordinate_p2=floor.coordinate_p2,
-        coordinate_p3=floor.coordinate_p3,
-        coordinate_p4=floor.coordinate_p4,
-        distance_p1_p2=floor.distance_p1_p2,
-        distance_p1_p3=floor.distance_p1_p3,
-        distance_p1_p4=floor.distance_p1_p4,
-        distance_p2_p3=floor.distance_p2_p3,
-        distance_p2_p4=floor.distance_p2_p4,
-        distance_p3_p4=floor.distance_p3_p4,
-    )
-    db.add(db_floor)
-    db.commit()
-    db.refresh(db_floor)
+    try:
+        # camera_idの重複チェック
+        if check_camera_id_exists(floor.camera_id, db):
+            raise HTTPException(
+                status_code=400, detail=f"Camera ID {floor.camera_id} already exists"
+            )
 
-    return JSONResponse(status_code=200, content={"message": "success"})
+        # 既存のユーザーを確認
+        existing_user = db.query(USERS).filter(USERS.user_id == "school1").first()
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="Referenced user not found")
+
+        db_floor = CAMERAS(
+            camera_id=floor.camera_id,
+            nursery_school_id="school1",  # 実在するユーザーIDを指定
+            is_setting_floor_area=True,
+            picture=b"test_picture",
+            coordinate_p1=floor.coordinate_p1,
+            coordinate_p2=floor.coordinate_p2,
+            coordinate_p3=floor.coordinate_p3,
+            coordinate_p4=floor.coordinate_p4,
+            distance_p1_p2=floor.distance_p1_p2,
+            distance_p1_p3=floor.distance_p1_p3,
+            distance_p1_p4=floor.distance_p1_p4,
+            distance_p2_p3=floor.distance_p2_p3,
+            distance_p2_p4=floor.distance_p2_p4,
+            distance_p3_p4=floor.distance_p3_p4,
+        )
+        db.add(db_floor)
+        db.commit()
+        db.refresh(db_floor)
+
+        return JSONResponse(status_code=200, content={"message": "success"})
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create floor: {str(e)}")
 
 
 # 床エリアを取得するAPI
 @router.get("/get_floor", response_model=CamerasFloorResponse)
 def get_floor(camera_id: str, db: Session = Depends(get_db)):
     cameras = db.query(CAMERAS).filter(CAMERAS.camera_id == camera_id).first()
-    return (
-        cameras.distance_p1_p2,
-        cameras.distance_p1_p3,
-        cameras.distance_p1_p4,
-        cameras.distance_p2_p3,
-        cameras.distance_p2_p4,
-        cameras.distance_p3_p4,
-        cameras.coordinate_p1,
-        cameras.coordinate_p2,
-        cameras.coordinate_p3,
-        cameras.coordinate_p4,
-    )
+    return {
+        "distance_p1_p2": cameras.distance_p1_p2,
+        "distance_p1_p3": cameras.distance_p1_p3,
+        "distance_p1_p4": cameras.distance_p1_p4,
+        "distance_p2_p3": cameras.distance_p2_p3,
+        "distance_p2_p4": cameras.distance_p2_p4,
+        "distance_p3_p4": cameras.distance_p3_p4,
+        "coordinate_p1": cameras.coordinate_p1,
+        "coordinate_p2": cameras.coordinate_p2,
+        "coordinate_p3": cameras.coordinate_p3,
+        "coordinate_p4": cameras.coordinate_p4,
+    }
 
 
 # ---------------------------------------------------------------------

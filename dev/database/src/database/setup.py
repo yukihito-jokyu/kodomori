@@ -5,6 +5,14 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import inspect, text
+
+
+# ## 今回使用しているデータベースのDATABASE_URL情報
+# データベース"postgres"にユーザー"postgres"として、ホスト"localhost"(アドレス"::1")上のポート"5432"で接続しています。
+
+# ## 今回使用しているデータベースのパスワード
+# kodomori_0110
 
 # 環境変数の取得
 load_dotenv()
@@ -28,6 +36,45 @@ CAMERAS = Base.classes.cameras
 ALERTS = Base.classes.alerts
 
 
+def inspect_tables():
+    print("\n=== テーブル一覧 ===")
+    for class_name in Base.classes.keys():
+        print(f"\n--- {class_name} テーブル ---")
+        table_class = Base.classes[class_name]
+        table = table_class.__table__
+
+        # カラム情報の取得
+        for column in table.columns:
+            print(f"\nカラム名: {column.name}")
+            print(f"型: {column.type}")
+            print(f"主キー?: {column.primary_key}")
+            print(f"Null許可?: {column.nullable}")
+
+            # デフォルト値の確認
+            if column.default:
+                print(f"デフォルト値: {column.default}")
+
+            # 外部キー制約の確認
+            for fk in column.foreign_keys:
+                print(f"外部キー: {fk.target_fullname}")
+
+            # その他の制約の確認
+            constraints = []
+            if column.unique:
+                constraints.append("UNIQUE")
+            if column.index:
+                constraints.append("INDEX")
+            if constraints:
+                print(f"制約: {', '.join(constraints)}")
+
+            print("---")
+
+        # テーブルの制約情報
+        print("\nテーブルの制約:")
+        for constraint in table.constraints:
+            print(f"- {constraint}")
+
+
 # データベース接続の確認
 def check_db_connection():
     conn = None
@@ -38,7 +85,10 @@ def check_db_connection():
 
         # ここでデータベース操作を行う
         cur = conn.cursor()
-        cur.execute("SELECT 1;")
+        cur.execute("SELECT * FROM *")
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
 
         # 結果を取得する
         result = cur.fetchone()
@@ -70,3 +120,40 @@ check_engine_connection()
 
 # テストの実行
 check_db_connection()
+
+inspect_tables()
+
+
+def display_all_tables():
+    session = SessionLocal()
+    try:
+        # テーブル一覧を取得
+        inspector = inspect(engine)
+        table_names = inspector.get_table_names()
+
+        for table_name in table_names:
+            print(f"\n=== {table_name} テーブルの内容 ===")
+            # 動的にSQLクエリを実行
+            result = session.execute(text(f"SELECT * FROM {table_name}"))
+            rows = result.fetchall()
+
+            if not rows:
+                print("データがありません")
+                continue
+
+            # カラム名を取得
+            columns = result.keys()
+            print("カラム:", ", ".join(columns))
+
+            # データを表示
+            for row in rows:
+                print(row)
+
+    except Exception as e:
+        print(f"エラーが発生しました: {e}")
+    finally:
+        session.close()
+
+
+if __name__ == "__main__":
+    display_all_tables()

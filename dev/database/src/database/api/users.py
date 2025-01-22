@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from utils.type import UserResponse
+from utils.type import UserResponse, LoginRequest
 
 from ..session_db import get_db
 from ..setup import USERS
@@ -19,9 +19,11 @@ async def read_test():
 
 # ログインAPI
 @router.post("/login", response_model=UserResponse)
-def login(user_id: str, db: Session = Depends(get_db)):
+def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     users = (
-        db.query(USERS.user_id, USERS.is_admin).filter(USERS.user_id == user_id).all()
+        db.query(USERS.nursery_school_id, USERS.is_admin)
+        .filter(USERS.user_id == login_data.user_id)
+        .first()
     )
     return users
 

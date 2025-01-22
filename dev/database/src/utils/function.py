@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from ..database.session_db import get_db
-from ..database.setup import CAMERAS, DANGERS, USERS, ALERTS
+from database.session_db import get_db
+from database.setup import CAMERAS, DANGERS, USERS, ALERTS
 
 
 def make_massage_alerts(alert_id: str, db: Session = Depends(get_db)):
