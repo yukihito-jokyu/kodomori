@@ -46,6 +46,8 @@ pydantic==2.10.3
     # via fastapi
 pydantic-core==2.27.1
     # via pydantic
+python-multipart==0.0.20
+    # via python
 pyyaml==6.0.2
     # via pre-commit
 ruff==0.8.2
@@ -62,3 +64,5 @@ uvicorn==0.32.1
     # via python
 virtualenv==20.28.0
     # via pre-commit
+websockets==14.1
+    # via python

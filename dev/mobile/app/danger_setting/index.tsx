@@ -1,12 +1,17 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, TextInput ,StyleSheet, Image, Pressable, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import CustomHeader from '@/components/CostomHeader';
 
 // import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
 
 export default function FloorSetting() {
     const [edit, setEdit] = useState<boolean>(true);
     const leftPosition = useRef(new Animated.Value(0)).current;
+
+    const handleMenuPress = (): void => {
+        alert('メニューがタップされました');
+      };
 
     const handleChangeEdit = () => {
         Animated.timing(leftPosition, {
@@ -19,6 +24,7 @@ export default function FloorSetting() {
     }
     return (
         <SafeAreaView>
+            <CustomHeader onMenuPress={handleMenuPress} />
             <View style={styles.changeButtonParent}>
                 <View style={styles.changeButtonWrapper}>
                     <Animated.View style={[
