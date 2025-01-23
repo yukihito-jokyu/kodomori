@@ -28,12 +28,12 @@ export default function FloorSetting() {
     const [resultImageData, setResultImageData] = useState<string | null>(null);
 
     const [distance, setDistance] = useState<Distance>({
-        p1_p2: 0,
-        p1_p3: 0,
-        p1_p4: 0,
-        p2_p3: 0,
-        p2_p4: 0,
-        p3_p4: 0,
+        p1_p2: 300,
+        p1_p3: 500,
+        p1_p4: 400,
+        p2_p3: 400,
+        p2_p4: 500,
+        p3_p4: 300,
     });
 
     const initialPins: Point[] = [

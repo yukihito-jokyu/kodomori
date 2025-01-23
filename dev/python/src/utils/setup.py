@@ -21,7 +21,9 @@ class MainApplication:
     def __init__(self) -> None:
         self.vision_processor = VisionProcessor(scale_factor=100)
         self.camera_thread = CameraThread(
-            frame_callback=self.update_frame, mapping_callback=self.handle_mapped_point
+            frame_callback=self.update_frame,
+            mapping_callback=self.handle_mapped_point,
+            camera_id=0,
         )
         self.zone_manager = ZoneManager()
         self.camera_thread.daemon = True
@@ -65,12 +67,18 @@ class MainApplication:
             except Exception as e:
                 print(f"Error loading data: {e}")
 
-    def next(self) -> str:
+    def next(self):
+        is_hit = False
+        is_hit_id = None
+        is_pred_hit = False
+        is_pred_hit_id = None
         try:
             warped = self.get_waped()
             if warped is not None:
                 warped_with_zone = self._draw_zones(warped)
-                warped_with_zone = self._draw_tracked_points(warped_with_zone)
+                warped_with_zone, is_hit, is_hit_id, is_pred_hit, is_pred_hit_id = (
+                    self._draw_tracked_points(warped_with_zone)
+                )
 
                 ret, buffer = cv2.imencode(".jpg", warped_with_zone)
                 # フレームをJPEG形式にエンコード
@@ -78,17 +86,23 @@ class MainApplication:
                 # Base64エンコードしてテキスト形式に変換
                 warped_with_zone_base64 = base64.b64encode(buffer).decode("utf-8")
 
-                return warped_with_zone_base64
+                return (
+                    warped_with_zone_base64,
+                    is_hit,
+                    is_hit_id,
+                    is_pred_hit,
+                    is_pred_hit_id,
+                )
             else:
                 # warpedがNoneの場合の処理
-                return ""
+                return "", is_hit, is_hit_id, is_pred_hit, is_pred_hit_id
         except cv2.error as e:
             print(f"OpenCV error occurred: {e}")
             # エラーが発生した場合、空の文字列を返す
-            return ""
+            return "", is_hit, is_hit_id, is_pred_hit, is_pred_hit_id
         except Exception as e:
             print(f"Unexpected error occurred: {e}")
-            return ""
+            return "", is_hit, is_hit_id, is_pred_hit, is_pred_hit_id
 
     def get_frame(self) -> str:
         frame = self.camera_thread.frame_buffer.get_frame()
@@ -268,6 +282,10 @@ class MainApplication:
     def _draw_tracked_points(self, warped):
         """Draw tracked points with zone detection"""
         # print(self.mapped_points)
+        is_hit = False
+        is_hit_id = None
+        is_pred_hit = False
+        is_pred_hit_id = None
         for point in self.mapped_points:
             try:
                 # Process tracking results using vision processor
@@ -281,7 +299,11 @@ class MainApplication:
                 if not (0 <= px < warped.shape[1] and 0 <= py < warped.shape[0]):
                     continue
 
-                print(px, py, result.prediction)
+                # Check zone collisions
+                zones_hit = self.zone_manager.check_point_in_zones((px, py))
+                if zones_hit:
+                    is_hit = True
+                    is_hit_id = point.get("track_id", "unknown")
 
                 # Color based on zone presence
                 point_color = (0, 255, 255)  # default yellow
@@ -305,11 +327,19 @@ class MainApplication:
                             2,
                         )
 
+                    # Check predicted position zone collisions
+                    pred_zones_hit = self.zone_manager.check_point_in_zones(
+                        (pred_x, pred_y)
+                    )
+                    if pred_zones_hit:
+                        is_pred_hit = True
+                        is_pred_hit_id = point.get("track_id", "unknown")
+
             except Exception as e:
                 print(f"Error processing tracking result: {e}")
                 continue
 
-        return warped
+        return warped, is_hit, is_hit_id, is_pred_hit, is_pred_hit_id
 
     def handle_mapped_point(self, point_data):
         """Process mapped points from tracking"""

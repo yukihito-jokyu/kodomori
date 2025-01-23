@@ -35,36 +35,30 @@ const CameraCard: React.FC = () => {
 
 
   // カメラ場所のデータとそれぞれのプルダウンアイテム
-  const [cameras] = useState<Camera[]>([
+  const [cameras, setCameras] = useState<Camera[]>([
     {
       id: '1',
       name: 'カメラ場所の名前',
-      status: '危険エリア n 箇所設定中',
-      set_button: 'カメラ確認',
+      status: '床エリア 未設定',
+      set_button: '床エリア設定',
       dropdownItems: [
-        { id: '1-1', label: '危険エリアA' },
-        { id: '1-2', label: '危険エリアB' },
-        { id: '1-3', label: '危険エリアC' },
       ],
     },
     {
       id: '2',
       name: 'カメラ場所の名前',
-      status: '危険エリア n 箇所設定中',
+      status: '危険エリア 0 箇所設定中',
       set_button: '危険エリア追加',
       dropdownItems: [
-        { id: '2-1', label: '危険エリアC' },
-        // { id: '2-2', label: '危険エリアD' },
       ],
     },
     {
       id: '3',
       name: 'カメラ場所の名前',
-      status: '危険エリア n 箇所設定中',
-      set_button: '床エリア追加',
+      status: '危険エリア 1 箇所設定中',
+      set_button: 'カメラ確認',
       dropdownItems: [
         { id: '3-1', label: '床エリア1' },
-        { id: '3-2', label: '床エリア2' },
       ],
     },
   ]);
@@ -77,14 +71,13 @@ const CameraCard: React.FC = () => {
     }));
   };
 
-  const handleLogin = (id: string) => {
-    if (id === '1') {
-      router.push("/camera_check"); //カメラ確認ボタンを押した時、"/floor_setting"に遷移
-    } else if (id === '2') {
-      router.push("/danger_setting"); //危険エリア追加ボタンを押した時、"/floor_setting"に遷移
-
-    } else if (id === '3') {
-      router.push("/floor_setting"); //床エリアボタンを押した時、"/floor_setting"に遷移
+  const handleLogin = (buttonName: string) => {
+    if (buttonName === '床エリア設定') {
+      router.push("/floor_setting");
+    } else if (buttonName === 'カメラ確認') {
+      router.push("/camera_check");
+    } else if (buttonName === '危険エリア追加') {
+      router.push("/danger_setting");
     }
     else {
       alert("Invalid Login ID"); // 無効なIDの場合はアラート表示
@@ -183,7 +176,7 @@ const CameraCard: React.FC = () => {
                     ? styles.danger_button
                     : styles.floor_button
                     
-                } key={camera.id} onPress={() => handleLogin(camera.id)}
+                } key={camera.id} onPress={() => handleLogin(camera.set_button)}
               >
                 <Text style={styles.buttonText}>{camera.set_button}</Text>
               </TouchableOpacity>
