@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CustomHeader from '@/components/CostomHeader';
-import CustomHeaderNursery from '@/components/ContomHeaerNursery';
+import { useRouter } from 'expo-router';
+
 import {
   StyleSheet,
   View,
@@ -11,6 +12,7 @@ import {
   ListRenderItem,
   ViewStyle,
 } from 'react-native';
+import { Camera } from 'lucide-react-native';
 
 interface DropdownItem {
   id: string;
@@ -28,6 +30,8 @@ interface Camera {
 
 const CameraCard: React.FC = () => {
   const [dropdownStates, setDropdownStates] = useState<Record<string, boolean>>({});
+  
+  const router = useRouter();
 
 
   // カメラ場所のデータとそれぞれのプルダウンアイテム
@@ -73,6 +77,22 @@ const CameraCard: React.FC = () => {
     }));
   };
 
+  const handleLogin = (id: string) => {
+    if (id === '1') {
+      router.push("/camera_check"); //カメラ確認ボタンを押した時、"/floor_setting"に遷移
+    } else if (id === '2') {
+      router.push("/danger_setting"); //危険エリア追加ボタンを押した時、"/floor_setting"に遷移
+
+    } else if (id === '3') {
+      router.push("/floor_setting"); //床エリアボタンを押した時、"/floor_setting"に遷移
+    }
+    else {
+      alert("Invalid Login ID"); // 無効なIDの場合はアラート表示
+    }
+  };
+
+  
+
   const handleMenuPress = (): void => {
     alert('メニューがタップされました');
   };
@@ -96,7 +116,6 @@ const CameraCard: React.FC = () => {
         <View style={index === 0 ? null:styles.verticalLineOther} />
         <View style={index === 0 ? null : styles.diagonalLineOther} />
       </View>
-  
       {/* プルダウンアイテム */}
       <View style={styles.dropdownItem}>
         <View style={styles.DropimageContainer}>
@@ -108,7 +127,14 @@ const CameraCard: React.FC = () => {
         <View style={styles.textContainer}>
           <Text style={styles.itemLabel}>{item.label}</Text>
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.editButton}>
+            <TouchableOpacity 
+              style={styles.editButton} 
+              onPress={() => {
+                const left_id = item.id.split('-')[0]; //dropdownItem　id内の左の数値を判別
+                const id_Pass = (left_id === '1' || left_id === '2') ? '2': left_id;
+                handleLogin(id_Pass)
+              }} 
+            > 
               <Text style={styles.buttonText}>編集</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.deleteButton}>
@@ -130,6 +156,7 @@ const CameraCard: React.FC = () => {
           <TouchableOpacity
             style={styles.container}
             onPress={() => toggleDropdown(camera.id)}
+            activeOpacity={1}
           >
             <View style={styles.imageContainer}>
               <Image
@@ -155,7 +182,8 @@ const CameraCard: React.FC = () => {
                     : camera.set_button === '危険エリア追加'
                     ? styles.danger_button
                     : styles.floor_button
-                }
+                    
+                } key={camera.id} onPress={() => handleLogin(camera.id)}
               >
                 <Text style={styles.buttonText}>{camera.set_button}</Text>
               </TouchableOpacity>

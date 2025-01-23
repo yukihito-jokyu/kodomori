@@ -2,16 +2,23 @@ import React, { useRef, useState } from 'react';
 import { View, Text, TextInput ,StyleSheet, Image, Pressable, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomHeader from '@/components/CostomHeader';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { useRouter } from 'expo-router';
 
 // import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
 
 export default function FloorSetting() {
     const [edit, setEdit] = useState<boolean>(true);
     const leftPosition = useRef(new Animated.Value(0)).current;
+    const router = useRouter();
 
     const handleMenuPress = (): void => {
         alert('メニューがタップされました');
       };
+
+    const saveButtonPress = ():void => {
+        router.push("/menu");
+    }
 
     const handleChangeEdit = () => {
         Animated.timing(leftPosition, {
@@ -86,9 +93,9 @@ export default function FloorSetting() {
                 </View>
             </View>
             <View style={styles.saveButtonWrapper}>
-                <View style={styles.saveButton}>
+                <TouchableWithoutFeedback style={styles.saveButton} onPress={saveButtonPress}>
                     <Text style={styles.saveButtonText}>保存</Text>
-                </View>
+                </TouchableWithoutFeedback>
             </View>
         </SafeAreaView>
     );
