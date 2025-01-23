@@ -1,15 +1,24 @@
 
 import React, { useState} from 'react';
-import { View, Text, TextInput ,StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, TextInput ,StyleSheet, TouchableOpacity,Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link,Stack } from 'expo-router';
-
-// import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
+import {Stack,useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 export default function LoginScreen() {
     const[loginID,setLoginID] = useState('');
+    const router = useRouter();
 
-
+    const handleLogin = () => {
+      if (loginID === "0") {
+        router.push("/menu"); // loginIDが"0"なら"/menu"に遷移
+      } else if (loginID === "1") {
+        router.push("/"); // loginIDが"1"なら"/"に遷移
+      } else {
+        alert("Invalid Login ID"); // 無効なIDの場合はアラート表示
+      }
+    };
   
     return (
         
@@ -23,16 +32,14 @@ export default function LoginScreen() {
               onChangeText={setLoginID}
               placeholder="Enter Login ID"
               placeholderTextColor="#888"
+              keyboardType="numeric" // 数字入力を強制
             />
-            <TouchableOpacity style={styles.button}>
-                <Link href="/">
+            <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={1}>
                 <Text style={styles.buttonText}>LOGIN</Text>
-                </Link>
             </TouchableOpacity>
             <Stack>
                 <Stack.Screen name="login" options={{ headerShown: false }} />
             </Stack>
-
 
           </View>
           
