@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomHeader from '@/components/CostomHeader';
 import { SettingField } from '@/components/FloorSetting/SettingField';
 import { fetchWrap, postPin } from '@/api/Frame';
+import { useRouter } from 'expo-router';
 
 interface Point {
     x: number;
@@ -29,6 +30,7 @@ export default function FloorSetting() {
     ];
     
     const [pins, setPins] = useState<Point[]>(initialPins);
+    const router = useRouter();
 
     const handleMenuPress = (): void => {
         alert('メニューがタップされました');

@@ -4,10 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
 
 
+
 export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+
       <View style={styles.content}>
         <Text style={styles.title}>ホーム画面</Text>
         <Text style={styles.description}>アプリのメイン画面です。</Text>

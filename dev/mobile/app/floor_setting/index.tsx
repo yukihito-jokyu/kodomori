@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomHeader from '@/components/CostomHeader';
 import { fetchFrame, postPinAndDistance } from '@/api/Frame';
 import { SettingField } from '@/components/FloorSetting/SettingField';
+import { useRouter } from 'expo-router';
 
 // import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
 
@@ -45,10 +46,15 @@ export default function FloorSetting() {
     const [pins, setPins] = useState<Point[]>(initialPins);
 
     const leftPosition = useRef(new Animated.Value(0)).current;
+    const router = useRouter();
 
     const handleMenuPress = (): void => {
         alert('メニューがタップされました');
     };
+
+    const saveButtonPress = ():void => {
+        router.push("/menu");
+    }
 
     const handleChangeEdit = () => {
         Animated.timing(leftPosition, {

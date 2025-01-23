@@ -45,6 +45,7 @@ export default function RootLayout() {
         <Stack.Screen name="camera_check" options={{ headerShown: false }} />
         <Stack.Screen name="alert_list" options={{ headerShown: false }} />
         <Stack.Screen name="alert_detail" options={{ headerShown: false }} />
+        <Stack.Screen name="dangerous_area" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

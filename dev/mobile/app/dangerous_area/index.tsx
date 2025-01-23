@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { fetchFrame } from '@/api/Frame';
 import ImagePinHighlighter from './ImagePinHighlighter';
+import CustomHeaderNursery from '@/components/ContomHeaerNursery';
 
 const IMAGE_BASE_URL = 'http://127.0.0.1:8000/get-image/'; // 画像取得エンドポイントのベースURL
 
@@ -39,8 +40,13 @@ export default function AreaScreen() {
     </TouchableOpacity>
   );
 
+  const handleMenuPress = (): void => {
+    alert('メニューがタップされました');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <CustomHeaderNursery onMenuPress={handleMenuPress} />
       {/* <FlatList
         data={images}
         renderItem={renderItem}
@@ -65,7 +71,6 @@ export default function AreaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   imageItem: {
     padding: 10,
