@@ -1,20 +1,56 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, TextInput ,StyleSheet, Image, Pressable, Animated } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput ,StyleSheet, Image, Pressable, Animated, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomHeader from '@/components/CostomHeader';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { fetchFrame, postPinAndDistance } from '@/api/Frame';
+import { SettingField } from '@/components/FloorSetting/SettingField';
 import { useRouter } from 'expo-router';
 
 // import { Home, Map, PlayCircle, Settings } from 'lucide-react-native';
 
+interface Distance {
+    p1_p2: number;
+    p1_p3: number;
+    p1_p4: number;
+    p2_p3: number;
+    p2_p4: number;
+    p3_p4: number;
+}
+
+interface Point {
+    x: number;
+    y: number;
+}
+
 export default function FloorSetting() {
     const [edit, setEdit] = useState<boolean>(true);
+    const [imageData, setImageData] = useState<string | null>(null);
+    const [resultImageData, setResultImageData] = useState<string | null>(null);
+
+    const [distance, setDistance] = useState<Distance>({
+        p1_p2: 300,
+        p1_p3: 500,
+        p1_p4: 400,
+        p2_p3: 400,
+        p2_p4: 500,
+        p3_p4: 300,
+    });
+
+    const initialPins: Point[] = [
+        { x: 50, y: 50 },
+        { x: 200, y: 50 },
+        { x: 200, y: 150 },
+        { x: 50, y: 150 },
+    ];
+    
+    const [pins, setPins] = useState<Point[]>(initialPins);
+
     const leftPosition = useRef(new Animated.Value(0)).current;
     const router = useRouter();
 
     const handleMenuPress = (): void => {
         alert('メニューがタップされました');
-      };
+    };
 
     const saveButtonPress = ():void => {
         router.push("/menu");
@@ -28,7 +64,57 @@ export default function FloorSetting() {
         }).start();
 
         setEdit(!edit);
-    }
+    };
+
+    // distanceの値を変更する
+    const changeDistance = (key: keyof Distance, text: string): void => {
+        const value = parseFloat(text) || 0;
+        setDistance(prevState => ({
+            ...prevState,
+            [key]: value,
+        }));
+    };
+
+    // distanceの保存
+    const handleSave = async () => {
+        console.log('Save button clicked');
+        const pinAndDistance = {
+            p1_p2: distance.p1_p2,
+            p1_p3: distance.p1_p3,
+            p1_p4: distance.p1_p4,
+            p2_p3: distance.p2_p3,
+            p2_p4: distance.p2_p4,
+            p3_p4: distance.p3_p4,
+            pin_1_x: pins[0].x,
+            pin_1_y: pins[0].y,
+            pin_2_x: pins[1].x,
+            pin_2_y: pins[1].y,
+            pin_3_x: pins[2].x,
+            pin_3_y: pins[2].y,
+            pin_4_x: pins[3].x,
+            pin_4_y: pins[3].y,
+        }
+        const result = await postPinAndDistance(pinAndDistance);
+        if (result.warped_base64) {
+            console.log("成功");
+            setResultImageData(`data:image/jpeg;base64,${result.warped_base64}`);
+        } else {
+            console.log("失敗");
+        }
+    };
+
+    useEffect(() => {
+        const fetchImage = async () => {
+            const result = await fetchFrame();
+            if (result.frame_base64) {
+                setImageData(`data:image/jpeg;base64,${result.frame_base64}`);
+            } else {
+                console.log("失敗");
+            }
+        }
+
+        fetchImage();
+    }, []);
     return (
         <SafeAreaView>
             <CustomHeader onMenuPress={handleMenuPress} />
@@ -65,37 +151,87 @@ export default function FloorSetting() {
                 <View style={styles.pointBoxLeft}>
                     <View style={styles.pointInputBox}>
                         <Text style={styles.pointInputText}>Distance P1 to P2</Text>
-                        <TextInput style={styles.pointInput}></TextInput>
+                        <TextInput
+                            style={styles.pointInput}
+                            value={distance.p1_p2.toString()}
+                            onChangeText={(text) => changeDistance("p1_p2", text)}
+                            placeholder="Enter distance p1_p2"
+                            keyboardType="numeric"
+                        />
                     </View>
                     <View style={styles.pointInputBox}>
                         <Text style={styles.pointInputText}>Distance P1 to P3</Text>
-                        <TextInput style={styles.pointInput}></TextInput>
+                        <TextInput
+                            style={styles.pointInput}
+                            value={distance.p1_p3.toString()}
+                            onChangeText={(text) => changeDistance("p1_p3", text)}
+                            placeholder="Enter distance p1_p3"
+                            keyboardType="numeric"
+                        />
                     </View>
                     <View style={styles.pointInputBox}>
                         <Text style={styles.pointInputText}>Distance P1 to P4</Text>
-                        <TextInput style={styles.pointInput}></TextInput>
+                        <TextInput
+                            style={styles.pointInput}
+                            value={distance.p1_p4.toString()}
+                            onChangeText={(text) => changeDistance("p1_p4", text)}
+                            placeholder="Enter distance p1_p4"
+                            keyboardType="numeric"
+                        />
                     </View>
                     <View style={styles.pointInputBox}>
                         <Text style={styles.pointInputText}>Distance P2 to P3</Text>
-                        <TextInput style={styles.pointInput}></TextInput>
+                        <TextInput
+                            style={styles.pointInput}
+                            value={distance.p2_p3.toString()}
+                            onChangeText={(text) => changeDistance("p2_p3", text)}
+                            placeholder="Enter distance p2_p3"
+                            keyboardType="numeric"
+                        />
                     </View>
                     <View style={styles.pointInputBox}>
                         <Text style={styles.pointInputText}>Distance P2 to P4</Text>
-                        <TextInput style={styles.pointInput}></TextInput>
+                        <TextInput
+                            style={styles.pointInput}
+                            value={distance.p2_p4.toString()}
+                            onChangeText={(text) => changeDistance("p2_p4", text)}
+                            placeholder="Enter distance p2_p4"
+                            keyboardType="numeric"
+                        />
                     </View>
                     <View style={styles.pointInputBox}>
                         <Text style={styles.pointInputText}>Distance P3 to P4</Text>
-                        <TextInput style={styles.pointInput}></TextInput>
+                        <TextInput
+                            style={styles.pointInput}
+                            value={distance.p3_p4.toString()}
+                            onChangeText={(text) => changeDistance("p3_p4", text)}
+                            placeholder="Enter distance p3_p4"
+                            keyboardType="numeric"
+                        />
                     </View>
                 </View>
-                <View style={styles.pointBoxRight}>
-                    <Image style={styles.pointImage}></Image>
-                </View>
+                {imageData && (
+                    <SettingField pins={pins} setPins={setPins} imageData={imageData} />
+                )}
             </View>
             <View style={styles.saveButtonWrapper}>
-                <TouchableWithoutFeedback style={styles.saveButton} onPress={saveButtonPress}>
-                    <Text style={styles.saveButtonText}>保存</Text>
+                <TouchableWithoutFeedback onPress={handleSave}>
+                    <View style={styles.saveButton}>
+                        <Text style={styles.saveButtonText}>保存</Text>
+                    </View>
                 </TouchableWithoutFeedback>
+            </View>
+            <View style={styles.resultImageWrapper}>
+                <Text style={styles.resultText}>結果</Text>
+                <View>
+                    {resultImageData && (
+                        <Image
+                            source={{ uri: resultImageData }}
+                            style={styles.resultImage}
+                            testID="image"
+                        />
+                    )}
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -173,4 +309,18 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
         fontSize: 16,
     },
+    resultImageWrapper: {
+        display: "flex",
+        // justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        height: 600,
+    },
+    resultText: {
+        marginTop: 20,
+    },
+    resultImage: {
+        width: 500,
+        height: 500,
+    }
 });

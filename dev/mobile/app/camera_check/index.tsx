@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import CustomHeaderNursery from '@/components/ContomHeaerNursery';
+import Popup from '@/components/Popup';
 
 export default function CameraCheckScreen() {
     const handleMenuPress = (): void => {
@@ -8,6 +9,17 @@ export default function CameraCheckScreen() {
     };
     const [status, setStatus] = useState<string>('Disconnected'); // 接続状態
     const [imageData, setImageData] = useState<string | null>('null'); // サーバーからのメッセージ
+
+    const [popupVisible, setPopupVisible] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const showPopup = () => {
+        setPopupVisible(true);
+    };
+
+    const closePopup = () => {
+        setPopupVisible(false);
+    };
 
     console.log('Component rendering started');
 
@@ -24,7 +36,24 @@ export default function CameraCheckScreen() {
         };
 
         ws.onmessage = (event: MessageEvent) => {
-        setImageData(`data:image/jpeg;base64,${event.data}`); // Base64データをImageに変換
+            if (event.data !== "") {
+                const data = JSON.parse(event.data);
+                // console.log(data.is_hit)
+                setImageData(`data:image/jpeg;base64,${data.image}`); // Base64データをImageに変換
+                // console.log(data.is_pred_hit)
+                if (data.is_pred_hit === true) {
+                    if (!popupVisible) {
+                        showPopup()
+                        setMessage(`子供 id: ${data.is_pred_hit_id} が危険エリアに入りそうです`)
+                    }
+                }
+                // if (data.is_hit === true) {
+                //     if (!popupVisible) {
+                //         showPopup()
+                //         setMessage(`子供${data.is_pred_hit_id}が危険エリアに入りました`)
+                //     }
+                // }
+            }
         };
 
         ws.onerror = () => {
@@ -61,6 +90,11 @@ export default function CameraCheckScreen() {
                     </View>
                 </View>
             </View>
+            <Popup
+                visible={popupVisible}
+                message={message}
+                onClose={closePopup}
+            />
         </SafeAreaView>
     )
 }

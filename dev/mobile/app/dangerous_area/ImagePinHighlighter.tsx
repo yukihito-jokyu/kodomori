@@ -1,17 +1,37 @@
-import React, { useState, useRef} from 'react';
+import React, { useState, useRef, useEffect} from 'react';
 import { View, Text, Image, TouchableWithoutFeedback, StyleSheet, PanResponder, Button} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import Svg, { Polygon } from 'react-native-svg';
+import { fetchFrame } from '@/api/Frame';
 
 interface Point {
   x: number;
   y: number;
 }
 
-const IMAGE_WIDTH = 300;
-const IMAGE_HEIGHT = 200;
+// const IMAGE_WIDTH = 300;
+// const IMAGE_HEIGHT = 200;
+const IMAGE_WIDTH = 500;
+const IMAGE_HEIGHT = 380;
 
 const IMAGE_BASE_URL = 'http://127.0.0.1:8000/get-image/';
+
+function fixPoint(x: number, y: number): {pointX: number, pointY: number} {
+  let pointX = x
+  let pointY = y
+  if (x < 0) {
+    pointX = 0
+  } else if (x > IMAGE_WIDTH) {
+    pointX = IMAGE_WIDTH
+  }
+  if (y < 0) {
+    pointY = 0
+  } else if (y > IMAGE_HEIGHT) {
+    pointY = IMAGE_HEIGHT
+  }
+  return { pointX: pointX, pointY: pointY }
+}
+
 
 const DraggablePin = ({
   index,
@@ -27,7 +47,8 @@ const DraggablePin = ({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {},
       onPanResponderMove: (evt, gestureState) => {
-        updatePinPosition(index, pin.x + gestureState.dx, pin.y + gestureState.dy);
+        const points = fixPoint(pin.x + gestureState.dx, pin.y + gestureState.dy)
+        updatePinPosition(index, points.pointX, points.pointY);
       },
       onPanResponderRelease: () => {},
     })
@@ -53,9 +74,11 @@ const DraggablePin = ({
 };
 
 export default function ImagePinHighlighter(): JSX.Element {
-  const route = useRoute();
-  const { imageName } = route.params as { imageName: string };
+  // const route = useRoute();
+  // const { imageName } = route.params as { imageName: string };
   const imageRef = useRef<View>(null);
+
+  const [imageData, setImageData] = useState<string | null>('null');
 
   const initialPins: Point[] = [
     { x: 50, y: 50 },
@@ -83,15 +106,32 @@ export default function ImagePinHighlighter(): JSX.Element {
     setSavedPins(pins);
   };
 
+  useEffect(() => {
+    const fetchImage = async () => {
+      const result = await fetchFrame();
+      if (result.frame_base64) {
+        setImageData(`data:image/jpeg;base64,${result.frame_base64}`);
+      } else {
+        console.log("失敗");
+      }
+    }
+
+    fetchImage();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View ref={imageRef} style={styles.imageContainer}>
         <TouchableWithoutFeedback>
-          <Image
-            source={{ uri: `${IMAGE_BASE_URL}${imageName}` }}
-            style={styles.image}
-            testID="image"
-          />
+          {imageData ? (
+            <Image
+              source={{ uri: imageData }}
+              style={styles.image}
+              testID="image"
+            />
+          ) : (
+            <Text>Waiting for data...</Text>
+          )}
         </TouchableWithoutFeedback>
         {/* 以下、ピンやSVGのコード */}
         {pins.length >= 3 && (
