@@ -12,6 +12,9 @@ dependencies = [
     "numpy>=2.2.0",
     "python-multipart>=0.0.20",
     "websockets>=14.1",
+    "scipy>=1.15.1",
+    "ultralytics>=8.3.63",
+    "lap>=0.5.12",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

@@ -24,7 +24,9 @@ export default function CameraCheckScreen() {
         };
 
         ws.onmessage = (event: MessageEvent) => {
-        setImageData(`data:image/jpeg;base64,${event.data}`); // Base64データをImageに変換
+            if (event.data !== "") {
+                setImageData(`data:image/jpeg;base64,${event.data}`); // Base64データをImageに変換
+            }
         };
 
         ws.onerror = () => {

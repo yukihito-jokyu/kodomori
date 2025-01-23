@@ -1,9 +1,7 @@
 import asyncio
-import base64
 
-import cv2
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from utils.setup import camera_thread
+from utils.setup import main_app
 
 router = APIRouter(
     prefix="/ws/camera",
@@ -19,15 +17,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         while True:
-            frame = camera_thread.next(black=False)
-            if frame is not None:
-                ret, buffer = cv2.imencode(".jpg", frame)
-                # フレームをJPEG形式にエンコード
-                _, buffer = cv2.imencode(".jpg", frame)
-                # Base64エンコードしてテキスト形式に変換
-                frame_base64 = base64.b64encode(buffer).decode("utf-8")
+            warped_with_zone_base64 = main_app.next()
+            if warped_with_zone_base64 is not None:
                 # WebSocketで送信
-                await websocket.send_text(frame_base64)
+                await websocket.send_text(warped_with_zone_base64)
                 # 適切なフレームレートで送信
                 await asyncio.sleep(0.03)  # 約30fps
             else:
